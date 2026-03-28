@@ -1,0 +1,31 @@
+{
+  "name": "wcag-audit",
+  "version": "1.0.0",
+  "description": "WCAG accessibility audit CLI — scan websites for accessibility violations with actionable reports",
+  "main": "src/index.js",
+  "bin": {
+    "wcag-audit": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "wcag",
+    "section-508",
+    "axe-core",
+    "audit",
+    "compliance",
+    "government"
+  ],
+  "author": "V Govindarajan",
+  "license": "MIT",
+  "dependencies": {
+    "axe-core": "^4.11.1",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "puppeteer": "^24.40.0"
+  }
+}
