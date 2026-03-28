@@ -1,19 +1,27 @@
 # wcag-audit
 
-WCAG accessibility audit CLI — scan websites for accessibility violations with actionable reports.
+> Scan any website for WCAG accessibility violations from your terminal.
 
-Built for government teams, compliance officers, and developers who need to ensure Section 508 and WCAG 2.1/2.2 conformance.
+Built for government teams, compliance officers, and developers who need Section 508 and WCAG 2.1/2.2 conformance.
+
+## Try it now
+
+No install needed:
+
+```bash
+npx wcag-audit scan https://example.com
+```
 
 ## Features
 
 - **Single page scan** — audit any URL for WCAG violations
 - **Sitemap crawling** — scan entire sites via sitemap.xml
-- **Configurable conformance level** — A, AA, or AAA
-- **Multiple output formats** — terminal, JSON, CSV
-- **Impact severity breakdown** — critical, serious, moderate, minor
-- **WCAG criterion mapping** — know exactly which criteria are violated
-- **CI/CD ready** — exits with non-zero code when violations found
-- **Programmatic API** — integrate into your testing pipeline
+- **Configurable level** — WCAG A, AA, or AAA
+- **Multiple formats** — terminal, JSON, CSV
+- **Severity breakdown** — critical, serious, moderate, minor
+- **WCAG criterion mapping** — know exactly which criteria fail
+- **CI/CD ready** — non-zero exit when violations found
+- **Programmatic API** — integrate into your pipeline
 
 ## Install
 
@@ -21,23 +29,26 @@ Built for government teams, compliance officers, and developers who need to ensu
 npm install -g wcag-audit
 ```
 
-## Quick Start
+## Usage
 
 ```bash
-# Scan a single page
+# Scan a page at AA level (default)
 wcag-audit scan https://example.gov
 
 # Scan at AAA level
 wcag-audit scan https://example.gov --level AAA
 
-# Output as JSON
+# JSON output for CI pipelines
 wcag-audit scan https://example.gov --format json --output report.json
 
-# Output as CSV for spreadsheet analysis
+# CSV for spreadsheet analysis
 wcag-audit scan https://example.gov --format csv --output report.csv
 
-# Crawl an entire site
+# Crawl an entire site via sitemap
 wcag-audit crawl https://example.gov/sitemap.xml --max-pages 100
+
+# Custom viewport (mobile testing)
+wcag-audit scan https://example.gov --viewport 375x812
 ```
 
 ## Example Output
@@ -56,17 +67,35 @@ wcag-audit crawl https://example.gov/sitemap.xml --max-pages 100
 
   [critical] image-alt: Images must have alternate text
     WCAG: wcag2a, wcag111
+    Help: https://dequeuniversity.com/rules/axe/4.10/image-alt
     Elements affected: 4
       → img.hero-banner
         Fix any of the following: Element does not have an alt attribute
 
   [serious] color-contrast: Elements must meet minimum color contrast ratio
     WCAG: wcag2aa, wcag143
+    Help: https://dequeuniversity.com/rules/axe/4.10/color-contrast
     Elements affected: 12
       → .nav-link
         Fix any of the following: Element has insufficient color contrast
 
 ════════════════════════════════════════════════════
+```
+
+## CI/CD Integration
+
+The CLI exits with code `1` when violations are found:
+
+```yaml
+# GitHub Actions
+- name: Accessibility Audit
+  run: npx wcag-audit scan ${{ env.DEPLOY_URL }} --level AA
+
+# GitLab CI
+accessibility:
+  script: npx wcag-audit scan $DEPLOY_URL --format json --output a11y.json
+  artifacts:
+    paths: [a11y.json]
 ```
 
 ## Programmatic API
@@ -79,32 +108,24 @@ const results = await scanUrl('https://example.gov', {
   viewport: { width: 1280, height: 720 },
 });
 
-// Access structured results
 console.log(`Violations: ${results.summary.totalViolations}`);
 console.log(`Critical: ${results.summary.impactBreakdown.critical}`);
-
-// Generate formatted report
 console.log(formatTextReport(results));
-```
-
-## CI/CD Integration
-
-The CLI exits with code `1` when violations are found, making it easy to integrate into CI pipelines:
-
-```yaml
-# GitHub Actions example
-- name: Accessibility Audit
-  run: npx wcag-audit scan ${{ env.DEPLOY_URL }} --level AA --format json --output a11y-report.json
 ```
 
 ## How It Works
 
-1. Launches a headless Chromium browser via Puppeteer
-2. Navigates to the target URL and waits for the page to load
+1. Launches headless Chromium via Puppeteer
+2. Navigates to the URL, waits for network idle
 3. Injects [axe-core](https://github.com/dequelabs/axe-core) into the page
-4. Runs the accessibility audit filtered to the specified WCAG level
+4. Runs accessibility audit filtered to specified WCAG level
 5. Collects violations, passes, and incomplete checks
-6. Formats results into the requested output format
+6. Formats results (text, JSON, or CSV)
+
+## Powered by
+
+- [axe-core](https://github.com/dequelabs/axe-core) — the accessibility testing engine used by Google, Microsoft, and government agencies worldwide
+- [Puppeteer](https://pptr.dev/) — headless Chrome for reliable page rendering
 
 ## License
 
